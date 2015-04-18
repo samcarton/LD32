@@ -265,7 +265,10 @@ class Player extends FlxSprite
 		animation.play("hurt",true);
 
 		Health -= Damage;		
-
+		if(Health <= 0)
+		{
+			kill();
+		}
 	}	
 
 	private function Flicker(duration:Float):Void
@@ -303,6 +306,18 @@ class Player extends FlxSprite
 			_sndLand.play(true);
 		}
 		_wasTouchingFloorBefore = isTouchingFloorNow;
+	}
+
+	override public function kill():Void
+	{
+		alive = false;
+		exists = false;
+		new flixel.util.FlxTimer(2, function(_){FinishKill();});		
+	}
+
+	public function FinishKill():Void
+	{
+		FlxG.resetState();
 	}
 
 }

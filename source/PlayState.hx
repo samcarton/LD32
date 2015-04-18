@@ -1,5 +1,6 @@
 package;
 
+import flash.filters.GlowFilter;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -11,6 +12,7 @@ import flixel.text.FlxText;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxBar;
 import flixel.util.FlxPoint;
+import flixel.effects.FlxSpriteFilter;
 using flixel.addons.editors.ogmo.FlxOgmoLoader;
 using flixel.addons.display.FlxZoomCamera;
 
@@ -48,10 +50,12 @@ class PlayState extends FlxState
 	private var _p1Keyboard:FlxTypedGroup<Keyboard>;
 	private var _p2Keyboard:FlxTypedGroup<Keyboard>;
 
+	// tilemap
 	private var _mapLoader:FlxOgmoLoader;
 	private var _tileMap:FlxTilemap;
 
-	private var _zoomCamera:FlxZoomCamera;
+	// camera
+	private var _zoomCamera:FlxZoomCamera;	
 
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -152,7 +156,7 @@ class PlayState extends FlxState
 		//FlxG.camera.follow(_dummyMidPoint, 5);
 		//FlxG.camera.zoom = 5;
 
-		add(new FlxText("PLAYSTATE"));
+		//add(new FlxText("PLAYSTATE"));
 		super.create();
 	}
 
@@ -277,7 +281,6 @@ class PlayState extends FlxState
 		FlxG.overlap(_p2Projectiles, _player1, OnProjectileOverlap);
 		FlxG.overlap(_p1Keyboard, _player2, OnKeyboardOverlap);
 		FlxG.overlap(_p2Keyboard, _player1, OnKeyboardOverlap);
-
 
 		//DebugCharge();
 		super.update();
