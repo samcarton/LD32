@@ -8,6 +8,7 @@ import flixel.util.FlxRandom;
 class ProjectileL1 extends FlxSprite
 {
 	private var _speed:Float;
+	public static var Damage:Float = 15;
 
 	public function new()
 	{

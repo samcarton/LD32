@@ -32,9 +32,11 @@ class PlayState extends FlxState
 	private var _p2ChargeBar:FlxBar;
 	private var _chargeDebug:FlxText;
 
-	// ProjectileL1s
+	// Projectiles
 	private var _p1ProjectileL1s:FlxTypedGroup<ProjectileL1>;
 	private var _p2ProjectileL1s:FlxTypedGroup<ProjectileL1>;
+	private var _p1ProjectileL2s:FlxTypedGroup<ProjectileL2>;
+	private var _p2ProjectileL2s:FlxTypedGroup<ProjectileL2>;
 
 	// group for organising projectiles
 	private var _p1Projectiles:FlxGroup;
@@ -64,17 +66,22 @@ class PlayState extends FlxState
 		// Projectiles
 		_p1ProjectileL1s = new FlxTypedGroup<ProjectileL1>();
 		_p2ProjectileL1s = new FlxTypedGroup<ProjectileL1>();
+		_p1ProjectileL2s = new FlxTypedGroup<ProjectileL2>();
+		_p2ProjectileL2s = new FlxTypedGroup<ProjectileL2>();
+
 		_p1ProjectileL1s.maxSize = 10;
 		_p2ProjectileL1s.maxSize = 10;		
+		_p1ProjectileL2s.maxSize = 5;
+		_p2ProjectileL2s.maxSize = 5;
 
-		_player1 = new Player(0xFFDA4200,_p1ProjectileL1s);
+		_player1 = new Player(0xFFDA4200,_p1ProjectileL1s,_p1ProjectileL2s);
 		_player1.LeftKeys = ["A"];
 		_player1.RightKeys = ["D"];
 		_player1.JumpKeys = ["W"];		
 		_player1.BufferSpamKeys = ["F"];
 		_player1.ShootKeys = ["R"];
 
-		_player2 = new Player(0xFFA3CE27,_p2ProjectileL1s);
+		_player2 = new Player(0xFFA3CE27,_p2ProjectileL1s,_p2ProjectileL2s);
 		_player2.LeftKeys = ["LEFT"];
 		_player2.RightKeys = ["RIGHT"];
 		_player2.JumpKeys = ["UP"];		
@@ -89,16 +96,22 @@ class PlayState extends FlxState
 		// Add ProjectileL1s after so they are drawn on top
 		add(_p1ProjectileL1s);
 		add(_p2ProjectileL1s);
+		add(_p1ProjectileL2s);
+		add(_p2ProjectileL2s);
+
+		// add projectiles to groups
+		_p1Projectiles = new FlxGroup();
+		_p1Projectiles.add(_p1ProjectileL1s);
+		_p1Projectiles.add(_p1ProjectileL2s);
+		_p2Projectiles = new FlxGroup();
+		_p2Projectiles.add(_p2ProjectileL1s);
+		_p2Projectiles.add(_p2ProjectileL2s);
 
 		_dummyMidPoint = new FlxSprite();
 		_dummyMidPoint.makeGraphic(0,0,0x000000); // Midpoint debug drawing
 		_dummyMidPoint.solid = false;
 		add(_dummyMidPoint);
-
-		_p1Projectiles = new FlxGroup();
-		_p1Projectiles.add(_p1ProjectileL1s);
-		_p2Projectiles = new FlxGroup();
-		_p2Projectiles.add(_p2ProjectileL1s);
+		
 
 		// BARS
 		CreateHealthBar(_player1,_p1HealthBar);
@@ -106,7 +119,7 @@ class PlayState extends FlxState
 		CreateChargeBars(_player1,_p1ChargeBar);
 		CreateChargeBars(_player2,_p2ChargeBar);
 
-		_chargeDebug = new FlxText(_player1.x, _player1.y, 100, "Charge", 10);
+		_chargeDebug = new FlxText(_player1.x, _player1.y, 100, "", 10);
 		add(_chargeDebug);
 		
 		_zoomCamera = new FlxZoomCamera(0,0,FlxG.width,FlxG.height,1);
@@ -140,7 +153,7 @@ class PlayState extends FlxState
 			// full gradient
 			[0xFFF7E26B,0xFFF7E26B,0xFFF7E26B,0xFFF7E26B,0xFFF7E26B,0xFFF7E26B,
 			0xFFDA4200,0xFFDA4200,0xFFDA4200,0xFFDA4200,0xFFDA4200,0xFFDA4200,
-			0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF
+			0xFF24A4FF,0xFF24A4FF,0xFF24A4FF,0xFF24A4FF,0xFF24A4FF,0xFF24A4FF
 			],1,0,true,0xFF262626);		
 		outBar.setParent(parent,"Charge",true,0,-8);
 		outBar.solid = false;
@@ -243,16 +256,22 @@ class PlayState extends FlxState
 		FlxG.overlap(_p1Projectiles, _player2, OnOverlap);
 		FlxG.overlap(_p2Projectiles, _player1, OnOverlap);
 
-		DebugCharge();
+		//DebugCharge();
 		super.update();
 		//FlxG.collide(_player1, _tileMap);
 	}	
 
 	private function OnOverlap(Sprite1:FlxObject, Sprite2:FlxObject):Void
 	{
-		if(Std.is(Sprite1, ProjectileL1))
+		if(Std.is(Sprite1, ProjectileL1) )
 		{
 			Sprite1.kill();
+			Sprite2.hurt(ProjectileL1.Damage);
+		}
+		else if(  Std.is(Sprite1, ProjectileL2))
+		{
+			Sprite1.kill();
+			Sprite2.hurt(ProjectileL2.Damage);
 		}
 	}
 

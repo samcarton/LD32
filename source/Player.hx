@@ -26,6 +26,7 @@ class Player extends FlxSprite
 	private var _chargeIncrement:Float;
 
 	private var _projectilesL1:FlxTypedGroup<ProjectileL1>;
+	private var _projectilesL2:FlxTypedGroup<ProjectileL2>;
 
 	private var _chargeEmptyValue:Float;
 	private static var _chargeLevel1:Float = 36;
@@ -33,7 +34,7 @@ class Player extends FlxSprite
 	private static var _chargeLevel3:Float = 95;
 	
 
-	public function new(PlayerColor:Int,X:Float = 0, Y:Float = 0, ProjectilesL1:FlxTypedGroup<ProjectileL1>)
+	public function new(PlayerColor:Int,X:Float = 0, Y:Float = 0, ProjectilesL1:FlxTypedGroup<ProjectileL1>, ProjectilesL2:FlxTypedGroup<ProjectileL2>)
 	{
 		super(X,Y);
 		
@@ -58,6 +59,7 @@ class Player extends FlxSprite
 		_chargeIncrement = 6;		
 
 		_projectilesL1 = ProjectilesL1;
+		_projectilesL2 = ProjectilesL2;
 
 	}
 
@@ -109,8 +111,13 @@ class Player extends FlxSprite
 		if(FlxG.keys.anyJustPressed(ShootKeys))
 		{
 			var midPoint:FlxPoint = getMidpoint();
-			_projectilesL1.recycle(ProjectileL1).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.15),velocity);
+			_projectilesL2.recycle(ProjectileL2).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.25),velocity);
 		}
 	}
+
+	override public function hurt(Damage:Float):Void
+	{
+		Health -= Damage;
+	}	
 
 }
