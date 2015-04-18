@@ -8,6 +8,7 @@ import flixel.group.FlxTypedGroup;
 import flixel.util.FlxPoint;
 import flixel.util.FlxAngle;
 import flixel.util.FlxSpriteUtil;
+import flixel.system.FlxSound;
 
 class Player extends FlxSprite
 {
@@ -31,6 +32,7 @@ class Player extends FlxSprite
 	private var _projectilesL2:FlxTypedGroup<ProjectileL2>;
 	private var _projectilesL3:FlxTypedGroup<ProjectileL3>;
 
+	// keyboard and swingin it
 	private var _keyboardGroup:FlxTypedGroup<Keyboard>;
 	private var _keyboard:Keyboard;
 	private var _keyboardOffset:Float;
@@ -48,12 +50,24 @@ class Player extends FlxSprite
 	private static var _angleDiffRight:Float = 7;
 	private static var _angleDiffLeft:Float = -7;
 
+	// hurt flicker
 	public var _flickering:Bool = false;
 
 	private var _chargeEmptyValue:Float;
 	private static var _chargeLevel1:Float = 36;
 	private static var _chargeLevel2:Float = 65;
 	private static var _chargeLevel3:Float = 95;
+
+	private var _sndCharging:FlxSound;
+	private var _sndChargeUp:FlxSound;	
+	private var _lastLevel:Int = 0 ;
+	private var _level:Int = 0 ;
+
+	private var _sndJump:FlxSound;
+	private var _sndHit:FlxSound;
+	private var _sndShoot:FlxSound;
+	private var _sndSwing:FlxSound;
+	public var _sndBigShootAfter:FlxSound;
 	
 
 	public function new(PlayerColor:Int,X:Float = 0, Y:Float = 0, 
@@ -97,6 +111,15 @@ class Player extends FlxSprite
 		_projectilesL1 = ProjectilesL1;
 		_projectilesL2 = ProjectilesL2;
 		_projectilesL3 = ProjectilesL3;
+
+		// Sounds
+		_sndCharging = FlxG.sound.load(AssetPaths.charging__wav);
+		_sndChargeUp = FlxG.sound.load(AssetPaths.chargeup__wav);
+		_sndJump = FlxG.sound.load(AssetPaths.jump1__wav);
+		_sndHit = FlxG.sound.load(AssetPaths.hit__wav);
+		_sndShoot = FlxG.sound.load(AssetPaths.shoot__wav);
+		_sndSwing = FlxG.sound.load(AssetPaths.swing__wav);
+		_sndBigShootAfter = FlxG.sound.load(AssetPaths.bigshootafter__wav);
 	}
 
 	override public function update():Void
@@ -105,6 +128,7 @@ class Player extends FlxSprite
 		ApplyCharge();
 		Shoot();
 		KeyboardAttack();
+		Sounds();
 		super.update();
 	} 
 	
@@ -124,6 +148,7 @@ class Player extends FlxSprite
 		if(FlxG.keys.anyJustPressed(JumpKeys) && isTouching(FlxObject.FLOOR)) 
 		{
 			velocity.y = -_jumpVelocity;
+			_sndJump.play(true);
 		}
 		if(isTouching(FlxObject.FLOOR) && velocity.x != 0)
 		{
@@ -133,14 +158,17 @@ class Player extends FlxSprite
 
 	private function ApplyCharge():Void
 	{
-		if(FlxG.keys.anyJustPressed(BufferSpamKeys))
-		{
-			Charge += _chargeIncrement;
-		}
 		if(Charge>= _chargeLevel3)
 		{
 			Charge	= _chargeLevel3;
+			return;
 		}
+		if(FlxG.keys.anyJustPressed(BufferSpamKeys))
+		{
+			Charge += _chargeIncrement;
+			_sndCharging.play(true);
+		}
+		
 	}
 
 	private function KeyboardAttack():Void
@@ -155,6 +183,7 @@ class Player extends FlxSprite
 			_swinging = true;
 			_swingFacing = facing;
 			_keyboard.HitDirection = facing;
+			_sndSwing.play(true);
 		}
 		
 		if(_swinging)
@@ -181,6 +210,7 @@ class Player extends FlxSprite
 		if(FlxG.keys.anyJustPressed(ShootKeys) && Charge > _chargeLevel1)
 		{
 			ShootBasedOnCharge();	
+			_sndShoot.play(true);
 		}
 	}	
 
@@ -190,6 +220,7 @@ class Player extends FlxSprite
 		{
 			var midPoint:FlxPoint = getMidpoint();
 			_projectilesL3.recycle(ProjectileL3).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.25),velocity);
+			new flixel.util.FlxTimer(0.1, function(_){_sndBigShootAfter.play(true);});
 		}
 		else if
 		(Charge >= _chargeLevel2)
@@ -201,10 +232,12 @@ class Player extends FlxSprite
 		(Charge >= _chargeLevel1)
 		{
 			var midPoint:FlxPoint = getMidpoint();
-			_projectilesL1.recycle(ProjectileL1).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.10),velocity);
+			_projectilesL1.recycle(ProjectileL1).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.10),velocity);			
 		}
 
 		Charge = _chargeEmptyValue;
+		_lastLevel = 0;
+		_level = 0;
 	}
 
 	override public function hurt(Damage:Float):Void
@@ -216,6 +249,8 @@ class Player extends FlxSprite
 
 		Flicker(1.2);
 
+		_sndHit.play(true);
+
 		Health -= Damage;		
 
 	}	
@@ -224,6 +259,30 @@ class Player extends FlxSprite
 	{
 		FlxSpriteUtil.flicker(this, duration, 0.02, true, true, function(_){_flickering = false;});
 		_flickering = true;
+	}
+
+	private function Sounds():Void
+	{
+		if(Charge >= _chargeLevel3)
+		{
+			_level = 3;
+		}
+		else if
+		(Charge >= _chargeLevel2)
+		{
+			_level = 2;
+		}
+		else if
+		(Charge >= _chargeLevel1)
+		{
+			_level = 1;
+		}
+
+		if(_level != _lastLevel)
+		{
+			_sndChargeUp.play(true);
+			_lastLevel = _level;
+		}
 	}
 
 }
