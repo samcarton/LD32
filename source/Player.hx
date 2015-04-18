@@ -18,10 +18,10 @@ class Player extends FlxSprite
 
 	private var _jumpVelocity:Float;
 	
-	public function new(X:Float = 0, Y:Float = 0)
+	public function new(PlayerColor:Int,X:Float = 0, Y:Float = 0)
 	{
 		super(X,Y);
-		makeGraphic(16,16, FlxColor.RED);
+		makeGraphic(16,16, PlayerColor);
 		maxVelocity.set(200,800);
 		acceleration.y = 400; // GRAVITY
 		drag.x = 1500;
