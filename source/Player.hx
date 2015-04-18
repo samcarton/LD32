@@ -6,6 +6,7 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.group.FlxTypedGroup;
 import flixel.util.FlxPoint;
+import flixel.util.FlxAngle;
 
 class Player extends FlxSprite
 {
@@ -27,6 +28,12 @@ class Player extends FlxSprite
 
 	private var _projectilesL1:FlxTypedGroup<ProjectileL1>;
 	private var _projectilesL2:FlxTypedGroup<ProjectileL2>;
+	private var _projectilesL3:FlxTypedGroup<ProjectileL3>;
+
+	private var _keyboard:Keyboard;
+	private var _keyboardOffset:Float;
+	private var _keyboardPoint:FlxPoint;
+	private var _angle:Float;
 
 	private var _chargeEmptyValue:Float;
 	private static var _chargeLevel1:Float = 36;
@@ -34,7 +41,11 @@ class Player extends FlxSprite
 	private static var _chargeLevel3:Float = 95;
 	
 
-	public function new(PlayerColor:Int,X:Float = 0, Y:Float = 0, ProjectilesL1:FlxTypedGroup<ProjectileL1>, ProjectilesL2:FlxTypedGroup<ProjectileL2>)
+	public function new(PlayerColor:Int,X:Float = 0, Y:Float = 0, 
+		ProjectilesL1:FlxTypedGroup<ProjectileL1>, 
+		ProjectilesL2:FlxTypedGroup<ProjectileL2>, 
+		ProjectilesL3:FlxTypedGroup<ProjectileL3>, 
+		keyboard:Keyboard)
 	{
 		super(X,Y);
 		
@@ -58,8 +69,14 @@ class Player extends FlxSprite
 		Charge = _chargeEmptyValue = 6;
 		_chargeIncrement = 6;		
 
+		_keyboardOffset = 15;
+		_angle = 0;
+		_keyboardPoint = new FlxPoint();
+
 		_projectilesL1 = ProjectilesL1;
 		_projectilesL2 = ProjectilesL2;
+		_projectilesL3 = ProjectilesL3;
+		_keyboard = keyboard;
 
 	}
 
@@ -68,6 +85,7 @@ class Player extends FlxSprite
 		ApplyMovement();
 		ApplyCharge();
 		Shoot();
+		KeyboardAttack();
 		super.update();
 	} 
 	
@@ -106,13 +124,44 @@ class Player extends FlxSprite
 		}
 	}
 
-	private function Shoot():Void
+	private function KeyboardAttack():Void
 	{
-		if(FlxG.keys.anyJustPressed(ShootKeys))
+		FlxAngle.rotatePoint(x + _keyboardOffset, y, x, y,_angle,_keyboardPoint);
+		_keyboard.x = _keyboardPoint.x;
+		_keyboard.y = _keyboardPoint.y;
+		_angle += 1;
+	}
+
+
+	private function Shoot():Void
+	{		
+		if(FlxG.keys.anyJustPressed(ShootKeys) && Charge > _chargeLevel1)
+		{
+			ShootBasedOnCharge();	
+		}
+	}	
+
+	private function ShootBasedOnCharge():Void
+	{
+		if(Charge >= _chargeLevel3)
 		{
 			var midPoint:FlxPoint = getMidpoint();
-			_projectilesL2.recycle(ProjectileL2).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.25),velocity);
+			_projectilesL3.recycle(ProjectileL3).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.25),velocity);
 		}
+		else if
+		(Charge >= _chargeLevel2)
+		{
+			var midPoint:FlxPoint = getMidpoint();
+			_projectilesL2.recycle(ProjectileL2).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.15),velocity);
+		}
+		else if
+		(Charge >= _chargeLevel1)
+		{
+			var midPoint:FlxPoint = getMidpoint();
+			_projectilesL1.recycle(ProjectileL1).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.10),velocity);
+		}
+
+		Charge = _chargeEmptyValue;
 	}
 
 	override public function hurt(Damage:Float):Void

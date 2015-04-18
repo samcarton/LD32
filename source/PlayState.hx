@@ -37,11 +37,16 @@ class PlayState extends FlxState
 	private var _p2ProjectileL1s:FlxTypedGroup<ProjectileL1>;
 	private var _p1ProjectileL2s:FlxTypedGroup<ProjectileL2>;
 	private var _p2ProjectileL2s:FlxTypedGroup<ProjectileL2>;
+	private var _p1ProjectileL3s:FlxTypedGroup<ProjectileL3>;
+	private var _p2ProjectileL3s:FlxTypedGroup<ProjectileL3>;
 
 	// group for organising projectiles
 	private var _p1Projectiles:FlxGroup;
 	private var _p2Projectiles:FlxGroup;
 
+	// keyboards
+	private var _p1Keyboard:Keyboard;
+	private var _p2Keyboard:Keyboard;
 
 	private var _mapLoader:FlxOgmoLoader;
 	private var _tileMap:FlxTilemap;
@@ -68,25 +73,35 @@ class PlayState extends FlxState
 		_p2ProjectileL1s = new FlxTypedGroup<ProjectileL1>();
 		_p1ProjectileL2s = new FlxTypedGroup<ProjectileL2>();
 		_p2ProjectileL2s = new FlxTypedGroup<ProjectileL2>();
+		_p1ProjectileL3s = new FlxTypedGroup<ProjectileL3>();
+		_p2ProjectileL3s = new FlxTypedGroup<ProjectileL3>();
 
 		_p1ProjectileL1s.maxSize = 10;
 		_p2ProjectileL1s.maxSize = 10;		
 		_p1ProjectileL2s.maxSize = 5;
 		_p2ProjectileL2s.maxSize = 5;
+		_p1ProjectileL3s.maxSize = 10;
+		_p2ProjectileL3s.maxSize = 10;
 
-		_player1 = new Player(0xFFDA4200,_p1ProjectileL1s,_p1ProjectileL2s);
+		// Keyboards
+		_p1Keyboard = new Keyboard();
+		_p2Keyboard = new Keyboard();
+
+		_player1 = new Player(0xFFDA4200,_p1ProjectileL1s,_p1ProjectileL2s,_p1ProjectileL3s, _p1Keyboard);
 		_player1.LeftKeys = ["A"];
 		_player1.RightKeys = ["D"];
 		_player1.JumpKeys = ["W"];		
 		_player1.BufferSpamKeys = ["F"];
 		_player1.ShootKeys = ["R"];
+		_player1.AttackKeys = ["G"];
 
-		_player2 = new Player(0xFFA3CE27,_p2ProjectileL1s,_p2ProjectileL2s);
+		_player2 = new Player(0xFFA3CE27,_p2ProjectileL1s,_p2ProjectileL2s,_p2ProjectileL3s, _p2Keyboard);
 		_player2.LeftKeys = ["LEFT"];
 		_player2.RightKeys = ["RIGHT"];
 		_player2.JumpKeys = ["UP"];		
 		_player2.BufferSpamKeys = ["L"];
 		_player2.ShootKeys = ["O"];
+		_player2.AttackKeys = ["K"];
 		_player2.facing = FlxObject.LEFT;
 
 		_mapLoader.loadEntities(PlaceEntities, "entities");
@@ -98,14 +113,21 @@ class PlayState extends FlxState
 		add(_p2ProjectileL1s);
 		add(_p1ProjectileL2s);
 		add(_p2ProjectileL2s);
+		add(_p1ProjectileL3s);
+		add(_p2ProjectileL3s);
+
+		add(_p1Keyboard);
+		add(_p2Keyboard);
 
 		// add projectiles to groups
 		_p1Projectiles = new FlxGroup();
 		_p1Projectiles.add(_p1ProjectileL1s);
 		_p1Projectiles.add(_p1ProjectileL2s);
+		_p1Projectiles.add(_p1ProjectileL3s);
 		_p2Projectiles = new FlxGroup();
 		_p2Projectiles.add(_p2ProjectileL1s);
 		_p2Projectiles.add(_p2ProjectileL2s);
+		_p2Projectiles.add(_p2ProjectileL3s);
 
 		_dummyMidPoint = new FlxSprite();
 		_dummyMidPoint.makeGraphic(0,0,0x000000); // Midpoint debug drawing
@@ -253,27 +275,56 @@ class PlayState extends FlxState
 		FlxG.collide(_p1Projectiles, _tileMap);
 		FlxG.collide(_p2Projectiles, _tileMap);
 		FlxG.collide(_p2Projectiles, _p1Projectiles);
-		FlxG.overlap(_p1Projectiles, _player2, OnOverlap);
-		FlxG.overlap(_p2Projectiles, _player1, OnOverlap);
+		FlxG.overlap(_p1Projectiles, _player2, OnProjectileOverlap);
+		FlxG.overlap(_p2Projectiles, _player1, OnProjectileOverlap);
+		FlxG.overlap(_p1Keyboard, _player2, OnKeyboardOverlap);
+		FlxG.overlap(_p2Keyboard, _player1, OnKeyboardOverlap);
+
 
 		//DebugCharge();
 		super.update();
 		//FlxG.collide(_player1, _tileMap);
 	}	
 
-	private function OnOverlap(Sprite1:FlxObject, Sprite2:FlxObject):Void
+	private function OnProjectileOverlap(Sprite1:FlxObject, Sprite2:FlxObject):Void
 	{
 		if(Std.is(Sprite1, ProjectileL1) )
 		{
 			Sprite1.kill();
-			Sprite2.hurt(ProjectileL1.Damage);
+			if(Std.is(Sprite2, Player) )
+			{
+				Sprite2.hurt(ProjectileL1.Damage);
+			}
 		}
 		else if(  Std.is(Sprite1, ProjectileL2))
 		{
 			Sprite1.kill();
-			Sprite2.hurt(ProjectileL2.Damage);
+			if(Std.is(Sprite2, Player) )
+			{
+				Sprite2.hurt(ProjectileL2.Damage);
+			}
 		}
+		else if(  Std.is(Sprite1, ProjectileL3))
+		{
+			Sprite1.kill();
+			if(Std.is(Sprite2, Player) )
+			{
+				Sprite2.hurt(ProjectileL3.Damage);
+			}
+		}		
 	}
+
+	private function OnKeyboardOverlap(Sprite1:FlxObject, Sprite2:FlxObject):Void
+	{
+		if(Std.is(Sprite1, Keyboard) )
+		{			
+			if(Std.is(Sprite2, Player) )
+			{
+				Sprite2.hurt(Keyboard.Damage);
+			}
+		}		
+	}
+
 
 	private function DebugCharge():Void
 	{
