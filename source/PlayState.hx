@@ -136,7 +136,7 @@ class PlayState extends FlxState
 		_p2Projectiles.add(_p2ProjectileL3s);
 
 		_dummyMidPoint = new FlxSprite();
-		_dummyMidPoint.makeGraphic(0,0,0x000000); // Midpoint debug drawing
+		_dummyMidPoint.makeGraphic(1,1,0x000000); // Midpoint debug drawing
 		_dummyMidPoint.solid = false;
 		add(_dummyMidPoint);
 		
@@ -165,7 +165,7 @@ class PlayState extends FlxState
 		outBar = new FlxBar(0, 0, FlxBar.FILL_LEFT_TO_RIGHT, 17, 3,parent, "Health", 0,100);
 		outBar.createFilledBar(0xFFFF0000,0xFF00FF00,true, 0xFF262626);
 		outBar.setParent(parent,"Health",true,0,-10);
-		outBar.solid = false;
+		//outBar.solid = false;
 		add(outBar);
 	}
 
@@ -184,7 +184,7 @@ class PlayState extends FlxState
 			0xFF24A4FF,0xFF24A4FF,0xFF24A4FF,0xFF24A4FF,0xFF24A4FF,0xFF24A4FF
 			],1,0,true,0xFF262626);		
 		outBar.setParent(parent,"Charge",true,0,-8);
-		outBar.solid = false;
+		//outBar.solid = false;
 		add(outBar);
 	}
 	

@@ -73,11 +73,12 @@ class Player extends FlxSprite
 	public var _sndBigShootAfter:FlxSound;
 	
 
-	public function new(PlayerColor:Int,X:Float = 0, Y:Float = 0, 
+	public function new(PlayerColor:Int,
 		ProjectilesL1:FlxTypedGroup<ProjectileL1>, 
 		ProjectilesL2:FlxTypedGroup<ProjectileL2>, 
 		ProjectilesL3:FlxTypedGroup<ProjectileL3>, 
-		keyboardGroup:FlxTypedGroup<Keyboard>)
+		keyboardGroup:FlxTypedGroup<Keyboard>,
+		X:Float = 0, Y:Float = 0 )
 	{
 		super(X,Y);
 		
