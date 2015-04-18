@@ -12,11 +12,22 @@ import flixel.util.FlxMath;
  */
 class PlayState extends FlxState
 {
+	private var _player1:Player;
+
+
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
 	override public function create():Void
 	{
+
+		_player1 = new Player(200,200);
+		_player1.LeftKeys = ["A"];
+		_player1.RightKeys = ["D"];
+		_player1.JumpKeys = ["W"];
+		add(_player1);
+
+		add(new FlxText("PLAYSTATE"));
 		super.create();
 	}
 	
