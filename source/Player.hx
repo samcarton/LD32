@@ -4,7 +4,7 @@ package ;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
-import flixel.ui.FlxBar;
+import flixel.group.FlxTypedGroup;
 
 class Player extends FlxSprite
 {
@@ -17,9 +17,16 @@ class Player extends FlxSprite
 	public var BufferSpamKeys:Array<String>;
 
 	private var _jumpVelocity:Float;
+
+	public var Charge:Float;
+	public var Health:Float;
+
+	private var _chargeIncrement:Float;
+
+	private var _projectiles:FlxTypedGroup<Projectile>;
 	
 
-	public function new(PlayerColor:Int,X:Float = 0, Y:Float = 0)
+	public function new(PlayerColor:Int,X:Float = 0, Y:Float = 0, Projectiles:FlxTypedGroup<Projectile>)
 	{
 		super(X,Y);
 		
@@ -39,11 +46,18 @@ class Player extends FlxSprite
 		drag.x = 1500;
 		_jumpVelocity = 250;
 
+		Health = 100;
+		Charge = 0;
+		_chargeIncrement = 10;
+
+		_projectiles = Projectiles;
+
 	}
 
 	override public function update():Void
 	{
 		ApplyMovement();
+		ApplyCharge();
 		super.update();
 	} 
 	
@@ -68,7 +82,14 @@ class Player extends FlxSprite
 		{
 			animation.play("walk");
 		}
+	}
 
+	private function ApplyCharge():Void
+	{
+		if(FlxG.keys.anyJustPressed(BufferSpamKeys))
+		{
+			Charge += _chargeIncrement;
+		}
 	}
 
 }

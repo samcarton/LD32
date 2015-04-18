@@ -5,6 +5,7 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.addons.display.FlxZoomCamera;
+import flixel.group.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxBar;
@@ -26,8 +27,12 @@ class PlayState extends FlxState
 	// bars
 	private var _p1HealthBar:FlxBar;
 	private var _p2HealthBar:FlxBar;
-	private var _p1ChargeBars:FlxBar;
-	private var _p2ChargeBars:Array<FlxBar>;
+	private var _p1ChargeBar:FlxBar;
+	private var _p2ChargeBar:FlxBar;
+
+	// projectiles
+	private var _p1Projectiles:FlxTypedGroup<Projectile>;
+	private var _p2Projectiles:FlxTypedGroup<Projectile>;
 
 	private var _mapLoader:FlxOgmoLoader;
 	private var _tileMap:FlxTilemap;
@@ -39,7 +44,7 @@ class PlayState extends FlxState
 	 */
 	override public function create():Void
 	{
-		//FlxG.mouse.visible = false;
+		//FlxG.mouse.visible = false;		
 
 		FlxG.cameras.bgColor = 0xFF666666;
 
@@ -49,15 +54,23 @@ class PlayState extends FlxState
 		_tileMap.setTileProperties(2, FlxObject.WALL);
 		add(_tileMap);
 
-		_player1 = new Player(0xFFDA4200);
+		// projectiles
+		_p1Projectiles = new FlxTypedGroup<Projectile>();
+		_p2Projectiles = new FlxTypedGroup<Projectile>();
+		_p1Projectiles.maxSize = 10;
+		_p2Projectiles.maxSize = 10;
+
+		_player1 = new Player(0xFFDA4200,_p1Projectiles);
 		_player1.LeftKeys = ["A"];
 		_player1.RightKeys = ["D"];
 		_player1.JumpKeys = ["W"];		
+		_player1.BufferSpamKeys = ["F"];
 
-		_player2 = new Player(0xFFA3CE27);
+		_player2 = new Player(0xFFA3CE27,_p2Projectiles);
 		_player2.LeftKeys = ["LEFT"];
 		_player2.RightKeys = ["RIGHT"];
 		_player2.JumpKeys = ["UP"];		
+		_player2.BufferSpamKeys = ["L"];
 		_player2.facing = FlxObject.LEFT;
 
 		_mapLoader.loadEntities(PlaceEntities, "entities");
@@ -73,7 +86,8 @@ class PlayState extends FlxState
 		// BARS
 		CreateHealthBar(_player1,_p1HealthBar);
 		CreateHealthBar(_player2,_p2HealthBar);		
-		CreateChargeBars(_player1,_p1ChargeBars);
+		CreateChargeBars(_player1,_p1ChargeBar);
+		CreateChargeBars(_player2,_p2ChargeBar);
 		
 		_zoomCamera = new FlxZoomCamera(0,0,FlxG.width,FlxG.height,1);
 		_zoomCamera.follow(_dummyMidPoint,5);
@@ -87,18 +101,28 @@ class PlayState extends FlxState
 
 	private function CreateHealthBar(parent:Dynamic, outBar:Dynamic):Void
 	{
-		outBar = new FlxBar(0, 0, FlxBar.FILL_LEFT_TO_RIGHT, 16, 3,parent, "health", 0,100);
+		outBar = new FlxBar(0, 0, FlxBar.FILL_LEFT_TO_RIGHT, 17, 3,parent, "Health", 0,100);
 		outBar.createFilledBar(0xFFFF0000,0xFF00FF00,true, 0xFF262626);
-		outBar.setParent(parent,"health",true,0,-10);
+		outBar.setParent(parent,"Health",true,0,-10);
 		outBar.solid = false;
 		add(outBar);
 	}
 
 	private function CreateChargeBars(parent:Dynamic, outBar:Dynamic):Void
 	{
-		outBar = new FlxBar(0, 0, FlxBar.FILL_LEFT_TO_RIGHT, 16, 3,parent, "charge", 0,100);
-		outBar.createFilledBar(0xFF0000FF,0xFF00FF00,true, 0xFF262626);
-		outBar.setParent(parent,"charge",true,0,-8);
+		outBar = new FlxBar(0, 0, FlxBar.FILL_LEFT_TO_RIGHT, 17, 3,parent, "Charge", 0,100);
+		//outBar.createFilledBar(0xFF0000FF,0xFF00FF00,true, 0xFF262626);
+		outBar.createGradientBar(
+			// empty gradient
+			[0xFFCCCCCC,0xFFCCCCCC,0xFFCCCCCC,0xFFCCCCCC,0xFFCCCCCC,0xFF31A2F2,
+			0xFFCCCCCC,0xFFCCCCCC,0xFFCCCCCC,0xFFCCCCCC,0xFFCCCCCC,0xFF31A2F2,
+			0xFFCCCCCC,0xFFCCCCCC,0xFFCCCCCC,0xFFCCCCCC,0xFFCCCCCC,0xFF31A2F2],
+			// full gradient
+			[0xFFF7E26B,0xFFF7E26B,0xFFF7E26B,0xFFF7E26B,0xFFF7E26B,0xFFF7E26B,
+			0xFFDA4200,0xFFDA4200,0xFFDA4200,0xFFDA4200,0xFFDA4200,0xFFDA4200,
+			0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF
+			],1,0,true,0xFF262626);		
+		outBar.setParent(parent,"Charge",true,0,-8);
 		outBar.solid = false;
 		add(outBar);
 	}
