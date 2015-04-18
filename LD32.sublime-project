@@ -1,0 +1,25 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"name": "LD32",
+			"path": "C:\\dev\\haxe/LD32"
+		},
+		{
+			"follow_symlinks": true,
+			"name": "Flixel",
+			"path": "C:\\dev\\HaxeToolkit\\haxe\\lib\\flixel/3,3,8/"
+		},
+		{
+			"follow_symlinks": true,
+			"name": "Flixel Addons",
+			"path": "C:\\dev\\HaxeToolkit\\haxe\\lib\\flixel-addons/1,1,0/"
+		},
+		{
+			"follow_symlinks": true,
+			"name": "Haxe",
+			"path": "C:\\dev\\HaxeToolkit\\haxe\\std"
+		}
+	]
+}
