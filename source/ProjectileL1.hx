@@ -16,11 +16,20 @@ class ProjectileL1 extends FlxSprite
 		loadGraphic(AssetPaths.keysL1__png,true,8,8);
 		animation.add("keys",[0,1,2,3,4,5,6,7,8,9,10,11],0,false);
 		acceleration.y = 400;
-		_speed = 150;
+		_speed = 250;
 		width = 8;
 		height = 8;
 	}
 	
+	override public function update():Void
+	{
+		if(touching != 0)
+		{
+			kill();
+		}
+		super.update();
+	}
+
 	public function Shoot(location:FlxPoint, direction:FlxPoint, parentVelocity:FlxPoint):Void
 	{
 		animation.randomFrame();

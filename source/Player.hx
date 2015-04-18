@@ -109,7 +109,7 @@ class Player extends FlxSprite
 		if(FlxG.keys.anyJustPressed(ShootKeys))
 		{
 			var midPoint:FlxPoint = getMidpoint();
-			_projectilesL1.recycle(ProjectileL1).Shoot(midPoint, new FlxPoint(1,-0.05),velocity);
+			_projectilesL1.recycle(ProjectileL1).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.15),velocity);
 		}
 	}
 

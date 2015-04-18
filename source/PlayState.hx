@@ -6,6 +6,7 @@ import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.addons.display.FlxZoomCamera;
 import flixel.group.FlxTypedGroup;
+import flixel.group.FlxGroup;
 import flixel.text.FlxText;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxBar;
@@ -35,6 +36,10 @@ class PlayState extends FlxState
 	private var _p1ProjectileL1s:FlxTypedGroup<ProjectileL1>;
 	private var _p2ProjectileL1s:FlxTypedGroup<ProjectileL1>;
 
+	// group for organising projectiles
+	private var _p1Projectiles:FlxGroup;
+	private var _p2Projectiles:FlxGroup;
+
 
 	private var _mapLoader:FlxOgmoLoader;
 	private var _tileMap:FlxTilemap;
@@ -56,7 +61,7 @@ class PlayState extends FlxState
 		_tileMap.setTileProperties(2, FlxObject.WALL);
 		add(_tileMap);
 
-		// ProjectileL1s
+		// Projectiles
 		_p1ProjectileL1s = new FlxTypedGroup<ProjectileL1>();
 		_p2ProjectileL1s = new FlxTypedGroup<ProjectileL1>();
 		_p1ProjectileL1s.maxSize = 10;
@@ -74,6 +79,7 @@ class PlayState extends FlxState
 		_player2.RightKeys = ["RIGHT"];
 		_player2.JumpKeys = ["UP"];		
 		_player2.BufferSpamKeys = ["L"];
+		_player2.ShootKeys = ["O"];
 		_player2.facing = FlxObject.LEFT;
 
 		_mapLoader.loadEntities(PlaceEntities, "entities");
@@ -89,6 +95,10 @@ class PlayState extends FlxState
 		_dummyMidPoint.solid = false;
 		add(_dummyMidPoint);
 
+		_p1Projectiles = new FlxGroup();
+		_p1Projectiles.add(_p1ProjectileL1s);
+		_p2Projectiles = new FlxGroup();
+		_p2Projectiles.add(_p2ProjectileL1s);
 
 		// BARS
 		CreateHealthBar(_player1,_p1HealthBar);
@@ -227,11 +237,24 @@ class PlayState extends FlxState
 		FlxG.collide(_player1, _tileMap);
 		FlxG.collide(_player2, _tileMap);
 		FlxG.collide(_player1, _player2);
+		FlxG.collide(_p1Projectiles, _tileMap);
+		FlxG.collide(_p2Projectiles, _tileMap);
+		FlxG.collide(_p2Projectiles, _p1Projectiles);
+		FlxG.overlap(_p1Projectiles, _player2, OnOverlap);
+		FlxG.overlap(_p2Projectiles, _player1, OnOverlap);
 
 		DebugCharge();
 		super.update();
 		//FlxG.collide(_player1, _tileMap);
 	}	
+
+	private function OnOverlap(Sprite1:FlxObject, Sprite2:FlxObject):Void
+	{
+		if(Std.is(Sprite1, ProjectileL1))
+		{
+			Sprite1.kill();
+		}
+	}
 
 	private function DebugCharge():Void
 	{
