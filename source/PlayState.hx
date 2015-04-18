@@ -29,10 +29,12 @@ class PlayState extends FlxState
 	private var _p2HealthBar:FlxBar;
 	private var _p1ChargeBar:FlxBar;
 	private var _p2ChargeBar:FlxBar;
+	private var _chargeDebug:FlxText;
 
-	// projectiles
-	private var _p1Projectiles:FlxTypedGroup<Projectile>;
-	private var _p2Projectiles:FlxTypedGroup<Projectile>;
+	// ProjectileL1s
+	private var _p1ProjectileL1s:FlxTypedGroup<ProjectileL1>;
+	private var _p2ProjectileL1s:FlxTypedGroup<ProjectileL1>;
+
 
 	private var _mapLoader:FlxOgmoLoader;
 	private var _tileMap:FlxTilemap;
@@ -54,19 +56,20 @@ class PlayState extends FlxState
 		_tileMap.setTileProperties(2, FlxObject.WALL);
 		add(_tileMap);
 
-		// projectiles
-		_p1Projectiles = new FlxTypedGroup<Projectile>();
-		_p2Projectiles = new FlxTypedGroup<Projectile>();
-		_p1Projectiles.maxSize = 10;
-		_p2Projectiles.maxSize = 10;
+		// ProjectileL1s
+		_p1ProjectileL1s = new FlxTypedGroup<ProjectileL1>();
+		_p2ProjectileL1s = new FlxTypedGroup<ProjectileL1>();
+		_p1ProjectileL1s.maxSize = 10;
+		_p2ProjectileL1s.maxSize = 10;		
 
-		_player1 = new Player(0xFFDA4200,_p1Projectiles);
+		_player1 = new Player(0xFFDA4200,_p1ProjectileL1s);
 		_player1.LeftKeys = ["A"];
 		_player1.RightKeys = ["D"];
 		_player1.JumpKeys = ["W"];		
 		_player1.BufferSpamKeys = ["F"];
+		_player1.ShootKeys = ["R"];
 
-		_player2 = new Player(0xFFA3CE27,_p2Projectiles);
+		_player2 = new Player(0xFFA3CE27,_p2ProjectileL1s);
 		_player2.LeftKeys = ["LEFT"];
 		_player2.RightKeys = ["RIGHT"];
 		_player2.JumpKeys = ["UP"];		
@@ -76,6 +79,10 @@ class PlayState extends FlxState
 		_mapLoader.loadEntities(PlaceEntities, "entities");
 		add(_player1);
 		add(_player2);
+
+		// Add ProjectileL1s after so they are drawn on top
+		add(_p1ProjectileL1s);
+		add(_p2ProjectileL1s);
 
 		_dummyMidPoint = new FlxSprite();
 		_dummyMidPoint.makeGraphic(0,0,0x000000); // Midpoint debug drawing
@@ -88,6 +95,9 @@ class PlayState extends FlxState
 		CreateHealthBar(_player2,_p2HealthBar);		
 		CreateChargeBars(_player1,_p1ChargeBar);
 		CreateChargeBars(_player2,_p2ChargeBar);
+
+		_chargeDebug = new FlxText(_player1.x, _player1.y, 100, "Charge", 10);
+		add(_chargeDebug);
 		
 		_zoomCamera = new FlxZoomCamera(0,0,FlxG.width,FlxG.height,1);
 		_zoomCamera.follow(_dummyMidPoint,5);
@@ -217,8 +227,16 @@ class PlayState extends FlxState
 		FlxG.collide(_player1, _tileMap);
 		FlxG.collide(_player2, _tileMap);
 		FlxG.collide(_player1, _player2);
+
+		DebugCharge();
 		super.update();
 		//FlxG.collide(_player1, _tileMap);
-		
 	}	
+
+	private function DebugCharge():Void
+	{
+		_chargeDebug.text = Std.string(_player1.Charge);
+		_chargeDebug.x = _player1.x;
+		_chargeDebug.y = _player1.y + 20;
+	}
 }

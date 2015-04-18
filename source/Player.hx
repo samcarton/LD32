@@ -5,6 +5,7 @@ import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.group.FlxTypedGroup;
+import flixel.util.FlxPoint;
 
 class Player extends FlxSprite
 {
@@ -15,6 +16,7 @@ class Player extends FlxSprite
 	public var AttackKeys:Array<String>;
 	public var BufferClearKeys:Array<String>;
 	public var BufferSpamKeys:Array<String>;
+	public var ShootKeys:Array<String>;
 
 	private var _jumpVelocity:Float;
 
@@ -23,10 +25,15 @@ class Player extends FlxSprite
 
 	private var _chargeIncrement:Float;
 
-	private var _projectiles:FlxTypedGroup<Projectile>;
+	private var _projectilesL1:FlxTypedGroup<ProjectileL1>;
+
+	private var _chargeEmptyValue:Float;
+	private static var _chargeLevel1:Float = 36;
+	private static var _chargeLevel2:Float = 65;
+	private static var _chargeLevel3:Float = 95;
 	
 
-	public function new(PlayerColor:Int,X:Float = 0, Y:Float = 0, Projectiles:FlxTypedGroup<Projectile>)
+	public function new(PlayerColor:Int,X:Float = 0, Y:Float = 0, ProjectilesL1:FlxTypedGroup<ProjectileL1>)
 	{
 		super(X,Y);
 		
@@ -47,10 +54,10 @@ class Player extends FlxSprite
 		_jumpVelocity = 250;
 
 		Health = 100;
-		Charge = 0;
-		_chargeIncrement = 10;
+		Charge = _chargeEmptyValue = 6;
+		_chargeIncrement = 6;		
 
-		_projectiles = Projectiles;
+		_projectilesL1 = ProjectilesL1;
 
 	}
 
@@ -58,6 +65,7 @@ class Player extends FlxSprite
 	{
 		ApplyMovement();
 		ApplyCharge();
+		Shoot();
 		super.update();
 	} 
 	
@@ -89,6 +97,19 @@ class Player extends FlxSprite
 		if(FlxG.keys.anyJustPressed(BufferSpamKeys))
 		{
 			Charge += _chargeIncrement;
+		}
+		if(Charge>= _chargeLevel3)
+		{
+			Charge	= _chargeLevel3;
+		}
+	}
+
+	private function Shoot():Void
+	{
+		if(FlxG.keys.anyJustPressed(ShootKeys))
+		{
+			var midPoint:FlxPoint = getMidpoint();
+			_projectilesL1.recycle(ProjectileL1).Shoot(midPoint, new FlxPoint(1,-0.05),velocity);
 		}
 	}
 
