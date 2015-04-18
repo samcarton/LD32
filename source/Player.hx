@@ -7,6 +7,7 @@ import flixel.FlxSprite;
 import flixel.group.FlxTypedGroup;
 import flixel.util.FlxPoint;
 import flixel.util.FlxAngle;
+import flixel.util.FlxSpriteUtil;
 
 class Player extends FlxSprite
 {
@@ -30,10 +31,24 @@ class Player extends FlxSprite
 	private var _projectilesL2:FlxTypedGroup<ProjectileL2>;
 	private var _projectilesL3:FlxTypedGroup<ProjectileL3>;
 
+	private var _keyboardGroup:FlxTypedGroup<Keyboard>;
 	private var _keyboard:Keyboard;
 	private var _keyboardOffset:Float;
 	private var _keyboardPoint:FlxPoint;
 	private var _angle:Float;
+	private var _angleDiff:Float;	
+	private var _angleFinish:Float;
+	private var _swinging:Bool;	
+	private var _swingFacing:Int;
+
+	private static var _angleStartRight:Float = -80;
+	private static var _angleStartLeft:Float = 260;
+	private static var _angleFinishRight:Float = 50;
+	private static var _angleFinishLeft:Float = 130;
+	private static var _angleDiffRight:Float = 7;
+	private static var _angleDiffLeft:Float = -7;
+
+	public var _flickering:Bool = false;
 
 	private var _chargeEmptyValue:Float;
 	private static var _chargeLevel1:Float = 36;
@@ -45,7 +60,7 @@ class Player extends FlxSprite
 		ProjectilesL1:FlxTypedGroup<ProjectileL1>, 
 		ProjectilesL2:FlxTypedGroup<ProjectileL2>, 
 		ProjectilesL3:FlxTypedGroup<ProjectileL3>, 
-		keyboard:Keyboard)
+		keyboardGroup:FlxTypedGroup<Keyboard>)
 	{
 		super(X,Y);
 		
@@ -71,13 +86,17 @@ class Player extends FlxSprite
 
 		_keyboardOffset = 15;
 		_angle = 0;
+		_angleDiff = 7;		
+		_angleFinish = 50;
 		_keyboardPoint = new FlxPoint();
+		_keyboardGroup = keyboardGroup;
+		_swinging = false;
+		_swingFacing = FlxObject.RIGHT;
+
 
 		_projectilesL1 = ProjectilesL1;
 		_projectilesL2 = ProjectilesL2;
 		_projectilesL3 = ProjectilesL3;
-		_keyboard = keyboard;
-
 	}
 
 	override public function update():Void
@@ -125,11 +144,35 @@ class Player extends FlxSprite
 	}
 
 	private function KeyboardAttack():Void
-	{
-		FlxAngle.rotatePoint(x + _keyboardOffset, y, x, y,_angle,_keyboardPoint);
-		_keyboard.x = _keyboardPoint.x;
-		_keyboard.y = _keyboardPoint.y;
-		_angle += 1;
+	{	
+		
+		if(FlxG.keys.anyJustPressed(AttackKeys) && _swinging == false)
+		{
+			_keyboard = _keyboardGroup.recycle(Keyboard);
+			_angle = facing == FlxObject.RIGHT ? _angleStartRight : _angleStartLeft;
+			_angleFinish = facing == FlxObject.RIGHT ? _angleFinishRight : _angleFinishLeft;
+			_angleDiff = facing == FlxObject.RIGHT ? _angleDiffRight : _angleDiffLeft;
+			_swinging = true;
+			_swingFacing = facing;
+			_keyboard.HitDirection = facing;
+		}
+		
+		if(_swinging)
+		{
+			FlxAngle.rotatePoint(x + _keyboardOffset, y, x, y,_angle,_keyboardPoint);			
+			_keyboard.x = _keyboardPoint.x;
+			_keyboard.y = _keyboardPoint.y;
+			_keyboard.angle = _angle;
+			_angle += _angleDiff;
+
+
+			if((_swingFacing == FlxObject.RIGHT && _angle >= _angleFinish) 
+				|| (_swingFacing == FlxObject.LEFT && _angle <= _angleFinish))
+			{
+				_swinging = false;
+				_keyboard.kill();
+			}
+		}
 	}
 
 
@@ -166,7 +209,21 @@ class Player extends FlxSprite
 
 	override public function hurt(Damage:Float):Void
 	{
-		Health -= Damage;
+		if(_flickering)
+		{
+			return;
+		}
+
+		Flicker(1.2);
+
+		Health -= Damage;		
+
 	}	
+
+	private function Flicker(duration:Float):Void
+	{
+		FlxSpriteUtil.flicker(this, duration, 0.02, true, true, function(_){_flickering = false;});
+		_flickering = true;
+	}
 
 }

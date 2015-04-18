@@ -45,8 +45,8 @@ class PlayState extends FlxState
 	private var _p2Projectiles:FlxGroup;
 
 	// keyboards
-	private var _p1Keyboard:Keyboard;
-	private var _p2Keyboard:Keyboard;
+	private var _p1Keyboard:FlxTypedGroup<Keyboard>;
+	private var _p2Keyboard:FlxTypedGroup<Keyboard>;
 
 	private var _mapLoader:FlxOgmoLoader;
 	private var _tileMap:FlxTilemap;
@@ -84,8 +84,10 @@ class PlayState extends FlxState
 		_p2ProjectileL3s.maxSize = 10;
 
 		// Keyboards
-		_p1Keyboard = new Keyboard();
-		_p2Keyboard = new Keyboard();
+		_p1Keyboard = new FlxTypedGroup<Keyboard>();
+		_p2Keyboard = new FlxTypedGroup<Keyboard>();
+		_p1Keyboard.maxSize = 1; 
+		_p2Keyboard.maxSize = 1; 
 
 		_player1 = new Player(0xFFDA4200,_p1ProjectileL1s,_p1ProjectileL2s,_p1ProjectileL3s, _p1Keyboard);
 		_player1.LeftKeys = ["A"];
@@ -234,14 +236,10 @@ class PlayState extends FlxState
 		if(xSeparation > maxSeparation)
 		{
 			_zoomCamera.targetZoom = maxZoom;
-			//FlxG.camera.setSize(maxWidth,maxHeight);
-			//FlxG.camera.zoom = maxZoom;
 		}
 		else if(xSeparation < minSeparation)
 		{
 			_zoomCamera.targetZoom = minZoom;
-			//FlxG.camera.setSize(minWidth,minHeight);
-			//FlxG.camera.zoom = minZoom;
 		}
 		else
 		{
@@ -310,6 +308,7 @@ class PlayState extends FlxState
 			if(Std.is(Sprite2, Player) )
 			{
 				Sprite2.hurt(ProjectileL3.Damage);
+				_zoomCamera.shake(0.01);
 			}
 		}		
 	}
@@ -321,6 +320,12 @@ class PlayState extends FlxState
 			if(Std.is(Sprite2, Player) )
 			{
 				Sprite2.hurt(Keyboard.Damage);
+				_zoomCamera.shake(0.005,0.1);
+				var kb:Keyboard = Std.instance(Sprite1, Keyboard);
+				if(kb != null)
+				{
+					Sprite2.velocity.x = kb.HitDirection == FlxObject.RIGHT ? Keyboard.HitVelocityX : -Keyboard.HitVelocityX ;
+				}
 			}
 		}		
 	}
