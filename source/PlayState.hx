@@ -43,22 +43,23 @@ class PlayState extends FlxState
 		_tileMap.setTileProperties(2, FlxObject.WALL);
 		add(_tileMap);
 
-		_player1 = new Player(0xFFBB2626);
+		_player1 = new Player(0xFFDA4200);
 		_player1.LeftKeys = ["A"];
 		_player1.RightKeys = ["D"];
 		_player1.JumpKeys = ["W"];		
 
-		_player2 = new Player(0xFF26BB26);
+		_player2 = new Player(0xFFA3CE27);
 		_player2.LeftKeys = ["LEFT"];
 		_player2.RightKeys = ["RIGHT"];
 		_player2.JumpKeys = ["UP"];		
+		_player2.facing = FlxObject.LEFT;
 
 		_mapLoader.loadEntities(PlaceEntities, "entities");
 		add(_player1);
 		add(_player2);
 
 		_dummyMidPoint = new FlxSprite();
-		_dummyMidPoint.makeGraphic(4,4,FlxColor.BLUE);
+		_dummyMidPoint.makeGraphic(0,0,0x000000); // Midpoint debug drawing
 		_dummyMidPoint.solid = false;
 		add(_dummyMidPoint);
 
