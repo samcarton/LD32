@@ -4,7 +4,7 @@ package ;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
-import flixel.util.FlxColor;
+import flixel.ui.FlxBar;
 
 class Player extends FlxSprite
 {
@@ -18,6 +18,7 @@ class Player extends FlxSprite
 
 	private var _jumpVelocity:Float;
 	
+
 	public function new(PlayerColor:Int,X:Float = 0, Y:Float = 0)
 	{
 		super(X,Y);
@@ -37,6 +38,7 @@ class Player extends FlxSprite
 		acceleration.y = 400; // GRAVITY
 		drag.x = 1500;
 		_jumpVelocity = 250;
+
 	}
 
 	override public function update():Void
@@ -58,7 +60,7 @@ class Player extends FlxSprite
 			facing = FlxObject.RIGHT;
 			acceleration.x = maxVelocity.x * 4;
 		}
-		if(FlxG.keys.anyPressed(JumpKeys) && isTouching(FlxObject.FLOOR)) 
+		if(FlxG.keys.anyJustPressed(JumpKeys) && isTouching(FlxObject.FLOOR)) 
 		{
 			velocity.y = -_jumpVelocity;
 		}

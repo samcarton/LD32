@@ -1,13 +1,13 @@
 package;
 
-import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.addons.display.FlxZoomCamera;
 import flixel.text.FlxText;
 import flixel.tile.FlxTilemap;
-import flixel.util.FlxColor;
+import flixel.ui.FlxBar;
 import flixel.util.FlxPoint;
 using flixel.addons.editors.ogmo.FlxOgmoLoader;
 using flixel.addons.display.FlxZoomCamera;
@@ -23,6 +23,12 @@ class PlayState extends FlxState
 	private var _p1MidPoint:FlxPoint;
 	private var _p2MidPoint:FlxPoint;
 
+	// bars
+	private var _p1HealthBar:FlxBar;
+	private var _p2HealthBar:FlxBar;
+	private var _p1ChargeBars:FlxBar;
+	private var _p2ChargeBars:Array<FlxBar>;
+
 	private var _mapLoader:FlxOgmoLoader;
 	private var _tileMap:FlxTilemap;
 
@@ -35,7 +41,7 @@ class PlayState extends FlxState
 	{
 		//FlxG.mouse.visible = false;
 
-		FlxG.cameras.bgColor = 0xFF262626;
+		FlxG.cameras.bgColor = 0xFF666666;
 
 		_mapLoader = new FlxOgmoLoader(AssetPaths.level001__oel);
 		_tileMap = _mapLoader.loadTilemap(AssetPaths.tiles__png,16,16,"stage");
@@ -63,6 +69,12 @@ class PlayState extends FlxState
 		_dummyMidPoint.solid = false;
 		add(_dummyMidPoint);
 
+
+		// BARS
+		CreateHealthBar(_player1,_p1HealthBar);
+		CreateHealthBar(_player2,_p2HealthBar);		
+		CreateChargeBars(_player1,_p1ChargeBars);
+		
 		_zoomCamera = new FlxZoomCamera(0,0,FlxG.width,FlxG.height,1);
 		_zoomCamera.follow(_dummyMidPoint,5);
 		FlxG.cameras.add(_zoomCamera);
@@ -71,6 +83,24 @@ class PlayState extends FlxState
 
 		add(new FlxText("PLAYSTATE"));
 		super.create();
+	}
+
+	private function CreateHealthBar(parent:Dynamic, outBar:Dynamic):Void
+	{
+		outBar = new FlxBar(0, 0, FlxBar.FILL_LEFT_TO_RIGHT, 16, 3,parent, "health", 0,100);
+		outBar.createFilledBar(0xFFFF0000,0xFF00FF00,true, 0xFF262626);
+		outBar.setParent(parent,"health",true,0,-10);
+		outBar.solid = false;
+		add(outBar);
+	}
+
+	private function CreateChargeBars(parent:Dynamic, outBar:Dynamic):Void
+	{
+		outBar = new FlxBar(0, 0, FlxBar.FILL_LEFT_TO_RIGHT, 16, 3,parent, "charge", 0,100);
+		outBar.createFilledBar(0xFF0000FF,0xFF00FF00,true, 0xFF262626);
+		outBar.setParent(parent,"charge",true,0,-8);
+		outBar.solid = false;
+		add(outBar);
 	}
 	
 	private function PlaceEntities(entityName:String, entityData:Xml):Void
@@ -119,7 +149,7 @@ class PlayState extends FlxState
 
 		// zoom
 		var maxZoom:Float = 1;
-		var minZoom:Float = 2;
+		var minZoom:Float = 3;
 		var zoomDifference:Float = minZoom - maxZoom;
 
 		if(xSeparation > maxSeparation)
@@ -160,7 +190,9 @@ class PlayState extends FlxState
 	override public function update():Void
 	{
 		UpdateMidPoint();
-		FlxG.collide();
+		FlxG.collide(_player1, _tileMap);
+		FlxG.collide(_player2, _tileMap);
+		FlxG.collide(_player1, _player2);
 		super.update();
 		//FlxG.collide(_player1, _tileMap);
 		
