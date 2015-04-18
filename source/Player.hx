@@ -64,6 +64,9 @@ class Player extends FlxSprite
 	private var _level:Int = 0 ;
 
 	private var _sndJump:FlxSound;
+	private var _sndLand:FlxSound;
+	private var _wasTouchingFloorBefore:Bool = true;
+
 	private var _sndHit:FlxSound;
 	private var _sndShoot:FlxSound;
 	private var _sndSwing:FlxSound;
@@ -83,6 +86,8 @@ class Player extends FlxSprite
 		setFacingFlip(FlxObject.LEFT,true,false );
 		setFacingFlip(FlxObject.RIGHT,false,false );
 		animation.add("walk",[1,0],8,false);
+		animation.add("hurt",[2,0],4,false);
+		animation.add("hurtWalk",[1,2,0],4,false);
 
 		color = PlayerColor;
 
@@ -116,6 +121,7 @@ class Player extends FlxSprite
 		_sndCharging = FlxG.sound.load(AssetPaths.charging__wav);
 		_sndChargeUp = FlxG.sound.load(AssetPaths.chargeup__wav);
 		_sndJump = FlxG.sound.load(AssetPaths.jump1__wav);
+		_sndLand = FlxG.sound.load(AssetPaths.land__wav);
 		_sndHit = FlxG.sound.load(AssetPaths.hit__wav);
 		_sndShoot = FlxG.sound.load(AssetPaths.shoot__wav);
 		_sndSwing = FlxG.sound.load(AssetPaths.swing__wav);
@@ -152,7 +158,13 @@ class Player extends FlxSprite
 		}
 		if(isTouching(FlxObject.FLOOR) && velocity.x != 0)
 		{
-			animation.play("walk");
+			if(_flickering)
+			{
+				animation.play("hurtWalk",true);
+			}else
+			{
+				animation.play("walk");
+			}			
 		}
 	}
 
@@ -207,7 +219,7 @@ class Player extends FlxSprite
 
 	private function Shoot():Void
 	{		
-		if(FlxG.keys.anyJustPressed(ShootKeys) && Charge > _chargeLevel1)
+		if(FlxG.keys.anyJustPressed(ShootKeys) && Charge >= _chargeLevel1)
 		{
 			ShootBasedOnCharge();	
 			_sndShoot.play(true);
@@ -250,6 +262,7 @@ class Player extends FlxSprite
 		Flicker(1.2);
 
 		_sndHit.play(true);
+		animation.play("hurt",true);
 
 		Health -= Damage;		
 
@@ -283,6 +296,13 @@ class Player extends FlxSprite
 			_sndChargeUp.play(true);
 			_lastLevel = _level;
 		}
+
+		var isTouchingFloorNow = isTouching(FlxObject.FLOOR);
+		if(_wasTouchingFloorBefore == false && isTouchingFloorNow)
+		{
+			_sndLand.play(true);
+		}
+		_wasTouchingFloorBefore = isTouchingFloorNow;
 	}
 
 }
