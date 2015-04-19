@@ -65,7 +65,8 @@ class Main extends Sprite
 		}
 
 		addChild(new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen));
-
+		#if flash
 		FlxG.sound.playMusic(AssetPaths.ld32song2__mp3,1,true);
+		#end
 	}
 }
