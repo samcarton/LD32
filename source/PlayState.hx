@@ -417,7 +417,7 @@ class PlayState extends FlxState
 			_p1HealthBar.visible = false;
 			_p1ChargeBar.visible = false;
 			_gameEndState = true;
-			_hudWinnerText.text = "PC1" + _hudWinnerText.text;
+			_hudWinnerText.text = "PC2" + _hudWinnerText.text;
 			_background.addDeathString();
 		}
 		if(_player2.alive == false && _gameEndState == false)
@@ -425,7 +425,7 @@ class PlayState extends FlxState
 			_p2HealthBar.visible = false;
 			_p2ChargeBar.visible = false;
 			_gameEndState = true;
-			_hudWinnerText.text = "PC2" + _hudWinnerText.text;
+			_hudWinnerText.text = "PC1" + _hudWinnerText.text;
 			_background.addDeathString();
 		}
 

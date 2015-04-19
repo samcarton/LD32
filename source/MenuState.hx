@@ -38,7 +38,7 @@ class MenuState extends FlxState
 		add(_background);
 
 		_titleSplash = new FlxSprite();
-		_titleSplash.loadGraphic(AssetPaths.titlesplashlrgwithInstructions__png,false,640,480);
+		_titleSplash.loadGraphic(AssetPaths.titlesplashlrgwithInstructions2__png,false,640,480);
 		add(_titleSplash);
 
 		_playButton = new FlxButton(0,0, "B:\\$H",OnClickPlay);
