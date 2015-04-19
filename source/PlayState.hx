@@ -15,6 +15,7 @@ import flixel.tile.FlxTilemap;
 import flixel.ui.FlxBar;
 import flixel.util.FlxPoint;
 import flixel.effects.FlxSpriteFilter;
+import flixel.system.FlxSound;
 using flixel.addons.editors.ogmo.FlxOgmoLoader;
 using flixel.addons.display.FlxZoomCamera;
 
@@ -71,13 +72,14 @@ class PlayState extends FlxState
 	private var _hudWinnerText:FlxText;
 	private var _hudRematchText:FlxText;
 	private var _gameEndState:Bool = false;
+	private var _buttonSound:FlxSound;
 
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
 	override public function create():Void
 	{
-		//FlxG.mouse.visible = false;		
+		FlxG.mouse.visible = false;
 
 		FlxG.cameras.bgColor = 0xFF666666;
 
@@ -208,6 +210,9 @@ class PlayState extends FlxState
 		_hudRematchText = new FlxText(3000 + FlxG.width/3,60,0,"REMATCH? Y/N",16);
 		_hudRematchText.visible = false;
 		add(_hudRematchText);
+
+		// sound
+		_buttonSound = FlxG.sound.load(AssetPaths.menuSelect__wav);
 		
 		super.create();
 	}
@@ -321,10 +326,10 @@ class PlayState extends FlxState
 		tryDestroy(_dummyMidPoint);
 		tryDestroy(_p1MidPoint);
 		tryDestroy(_p2MidPoint);
-		tryDestroy(_p1HealthBar);
-		tryDestroy(_p2HealthBar);
-		tryDestroy(_p1ChargeBar);
-		tryDestroy(_p2ChargeBar);
+		// tryDestroy(_p1HealthBar);
+		// tryDestroy(_p2HealthBar);
+		// tryDestroy(_p1ChargeBar);
+		// tryDestroy(_p2ChargeBar);
 		tryDestroy(_chargeDebug);
 		tryDestroy(_p1ProjectileL1s);
 		tryDestroy(_p2ProjectileL1s);
@@ -341,6 +346,11 @@ class PlayState extends FlxState
 		tryDestroy(_zoomCamera);	
 		tryDestroy(_p1Heal);
 		tryDestroy(_p2Heal);
+		tryDestroy(_scraps);		
+		tryDestroy(_hudBg);
+		tryDestroy(_hudWinnerText);
+		tryDestroy(_hudRematchText);
+		tryDestroy(_buttonSound);
 		super.destroy();
 	}
 
@@ -403,14 +413,15 @@ class PlayState extends FlxState
 			_hudRematchText.visible = true;
 			if(FlxG.keys.justPressed.Y)
 			{
-				FlxG.resetState();
+				_buttonSound.play(true);
+				new flixel.util.FlxTimer(0.5, function(_){FlxG.resetState();});
 			} 
 			else if(FlxG.keys.justPressed.N)
 			{
-				FlxG.switchState(new MenuState());
+				_buttonSound.play(true);
+				new flixel.util.FlxTimer(0.5, function(_){FlxG.switchState(new MenuState());});				
 			}
 		}
-
 	}
 
 	private function OnProjectileOverlap(Sprite1:FlxObject, Sprite2:FlxObject):Void

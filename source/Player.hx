@@ -353,13 +353,7 @@ class Player extends FlxSprite
 		{
 			ScrapsEmitter.at(this);
 			ScrapsEmitter.start(true,5,0,50);
-		}
-		//new flixel.util.FlxTimer(2, function(_){FinishKill();});		
-	}
-
-	public function FinishKill():Void
-	{
-		//FlxG.resetState();
+		}		
 	}
 
 }

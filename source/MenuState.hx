@@ -3,6 +3,7 @@ package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxGradient;
@@ -19,6 +20,7 @@ class MenuState extends FlxState
 	private var _titleSplash:FlxSprite;
 	private var _background:FlxSprite;
 	private var _creditText:FlxText;
+	private var _buttonSound:FlxSound;
 
 	private var _buttonHit:Bool;
 	/**
@@ -26,6 +28,7 @@ class MenuState extends FlxState
 	 */
 	override public function create():Void
 	{
+		FlxG.mouse.visible = true;
 		FlxG.cameras.bgColor = 0xFF000000;
 
 		_buttonHit = false;
@@ -57,6 +60,9 @@ class MenuState extends FlxState
 		_creditText.y = FlxG.height - 20;
 		add(_creditText);
 
+		// sound
+		_buttonSound = FlxG.sound.load(AssetPaths.menuSelect__wav);
+
 		super.create();
 	}
 	
@@ -64,6 +70,7 @@ class MenuState extends FlxState
 	{
 		if(_buttonHit == false)
 		{
+			_buttonSound.play(true);
 			FlxG.camera.fade(0xFF000000,1,false,OnFinishFade);
 			_buttonHit = true;
 		}		
@@ -99,6 +106,11 @@ class MenuState extends FlxState
 		{
 			_creditText.destroy();
 			_creditText = null;
+		}
+		if(_buttonSound != null)
+		{
+			_buttonSound.destroy();
+			_buttonSound = null;
 		}
 		super.destroy();
 	}
