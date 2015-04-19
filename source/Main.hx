@@ -68,5 +68,8 @@ class Main extends Sprite
 		#if flash
 		FlxG.sound.playMusic(AssetPaths.ld32song2__mp3,1,true);
 		#end
+		#if cpp
+		FlxG.sound.playMusic(AssetPaths.ld32song2__mp3,1,true);
+		#end
 	}
 }
