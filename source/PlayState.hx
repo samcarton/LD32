@@ -276,7 +276,44 @@ class PlayState extends FlxState
 	 */
 	override public function destroy():Void
 	{
+		tryDestroy(_player1);
+		tryDestroy(_player2);
+		tryDestroy(_dummyMidPoint);
+		tryDestroy(_p1MidPoint);
+		tryDestroy(_p2MidPoint);
+		tryDestroy(_p1HealthBar);
+		tryDestroy(_p2HealthBar);
+		tryDestroy(_p1ChargeBar);
+		tryDestroy(_p2ChargeBar);
+		tryDestroy(_chargeDebug);
+		tryDestroy(_p1ProjectileL1s);
+		tryDestroy(_p2ProjectileL1s);
+		tryDestroy(_p1ProjectileL2s);
+		tryDestroy(_p2ProjectileL2s);
+		tryDestroy(_p1ProjectileL3s);
+		tryDestroy(_p2ProjectileL3s);
+		tryDestroy(_p1Projectiles);
+		tryDestroy(_p2Projectiles);
+		tryDestroy(_p1Keyboard);
+		tryDestroy(_p2Keyboard);
+		tryDestroy(_mapLoader);
+		tryDestroy(_tileMap);
+		tryDestroy(_zoomCamera);	
+		tryDestroy(_p1Heal);
+		tryDestroy(_p2Heal);
 		super.destroy();
+	}
+
+	private static function tryDestroy(target:Dynamic):Void
+	{
+		if(target != null)
+		{
+			if(Std.is(target, FlxObject))
+			{
+				target.destroy();
+			}
+			target = null;
+		}
 	}
 
 	/**

@@ -5,6 +5,7 @@ import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
+import flixel.util.FlxGradient;
 import flixel.util.FlxMath;
 using flixel.util.FlxSpriteUtil;
 
@@ -14,20 +15,59 @@ using flixel.util.FlxSpriteUtil;
 class MenuState extends FlxState
 {
 	private var _playButton:FlxButton;
+	private var _titleText:FlxText;
+	private var _titleSplash:FlxSprite;
+	private var _background:FlxSprite;
+	private var _creditText:FlxText;
+
+	private var _buttonHit:Bool;
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
 	override public function create():Void
 	{
-		_playButton = new FlxButton(0,0, "Unconventional Play",OnClickPlay);
-		_playButton.screenCenter();
-		_playButton.color = 0xFF0000BB;
+		_buttonHit = false;
+
+		_background = FlxGradient.createGradientFlxSprite(800,250,[0xFF000000,0xFFFFFFFF,0xFF000000],10,90);
+		_background.y += 70;
+		add(_background);
+
+		_titleSplash = new FlxSprite();
+		_titleSplash.loadGraphic(AssetPaths.titlesplashlrgwithInstructions__png,false,640,480);
+		add(_titleSplash);
+
+		_playButton = new FlxButton(0,0, "B:\\$H",OnClickPlay);
+		_playButton.screenCenter();		
+		_playButton.color = 0xFFFFFFFF;
+		_playButton.label.color = 0xFF303030;		
+		_playButton.y += 40;
 		add(_playButton);
-		add(new FlxText("Buffer Bash"));
+
+		_titleText = new FlxText(0,0,0,"Buffer Over~B:\\$H");
+		_titleText.size = 32;		
+		_titleText.screenCenter();
+		_titleText.y -= 200;
+		_titleText.x -= _titleText.fieldWidth/3;
+		add(_titleText);
+
+		_creditText = new FlxText(0,0,0,"Ludum Dare 32 - by Sam Carton - April 2015");
+		_creditText.screenCenter();
+		_creditText.y = FlxG.height - 20;
+		add(_creditText);
+
 		super.create();
 	}
 	
 	private function OnClickPlay():Void
+	{
+		if(_buttonHit == false)
+		{
+			FlxG.camera.fade(0xFF000000,1,false,OnFinishFade);
+			_buttonHit = true;
+		}		
+	}
+
+	public function OnFinishFade():Void
 	{
 		FlxG.switchState(new PlayState());
 	}
@@ -38,6 +78,26 @@ class MenuState extends FlxState
 	 */
 	override public function destroy():Void
 	{
+		if(_playButton != null)
+		{
+			_playButton.destroy();
+			_playButton = null;
+		}
+		if(_titleText != null)
+		{
+			_titleText.destroy();
+			_titleText = null;
+		}
+		if(_titleSplash != null)
+		{
+			_titleSplash.destroy();
+			_titleSplash = null;
+		}
+		if(_creditText != null)
+		{
+			_creditText.destroy();
+			_creditText = null;
+		}
 		super.destroy();
 	}
 
