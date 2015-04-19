@@ -92,8 +92,8 @@ class Player extends FlxSprite
 
 		color = PlayerColor;
 
-		setSize(15,15);
-		offset.set(0,1);
+		setSize(15,14);
+		offset.set(0,2);
 
 		maxVelocity.set(200,800);
 		acceleration.y = 400; // GRAVITY
