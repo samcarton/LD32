@@ -59,6 +59,7 @@ class Player extends FlxSprite
 	private static var _chargeLevel2:Float = 65;
 	private static var _chargeLevel3:Float = 95;
 
+	// sounds
 	private var _sndCharging:FlxSound;
 	private var _sndChargeUp:FlxSound;	
 	private var _lastLevel:Int = 0 ;
@@ -72,6 +73,8 @@ class Player extends FlxSprite
 	private var _sndShoot:FlxSound;
 	private var _sndSwing:FlxSound;
 	public var _sndBigShootAfter:FlxSound;
+
+	public var _sndExplosion:FlxSound;
 
 	public var ScrapsEmitter:FlxEmitter;
 	
@@ -134,6 +137,7 @@ class Player extends FlxSprite
 		_sndShoot = FlxG.sound.load(AssetPaths.shoot__wav);
 		_sndSwing = FlxG.sound.load(AssetPaths.swing__wav);
 		_sndBigShootAfter = FlxG.sound.load(AssetPaths.bigshootafter__wav);
+		_sndExplosion = FlxG.sound.load(AssetPaths.explodeLong__wav);
 	}
 
 	override public function update():Void
@@ -355,10 +359,11 @@ class Player extends FlxSprite
 	{
 		alive = false;
 		exists = false;
+		_sndExplosion.play(true);
 		if(ScrapsEmitter != null)
 		{
 			ScrapsEmitter.at(this);
-			ScrapsEmitter.start(true,5,0,50);
+			ScrapsEmitter.start(true,0,0,50);
 		}		
 	}
 

@@ -182,8 +182,8 @@ class PlayState extends FlxState
 
 		// particles
 		_scraps = new FlxEmitter();
-		_scraps.setXSpeed(-150,150);
-		_scraps.setXSpeed(-200,0);
+		_scraps.setXSpeed(-300,300);
+		_scraps.setYSpeed(-400,50);
 		_scraps.setRotation(-720,720);
 		_scraps.gravity = 400;
 		_scraps.bounce = 0.35;
@@ -297,6 +297,8 @@ class PlayState extends FlxState
 		// zoom from 1       to  2
 		// based on x separation from ? to ?
 		var xSeparation:Float = Math.abs(_p2MidPoint.x - _p1MidPoint.x);
+		var ySeparation:Float = Math.abs(_p2MidPoint.y - _p1MidPoint.y);
+		var separation:Float = Math.sqrt(xSeparation*xSeparation + ySeparation*ySeparation);
 		var maxSeparation:Float = 500;
 		var minSeparation:Float = 50;
 		var separationDifference:Float = maxSeparation - minSeparation;
@@ -314,17 +316,17 @@ class PlayState extends FlxState
 		var minZoom:Float = 3;
 		var zoomDifference:Float = minZoom - maxZoom;
 
-		if(xSeparation > maxSeparation)
+		if(separation > maxSeparation)
 		{
 			_zoomCamera.targetZoom = maxZoom;
 		}
-		else if(xSeparation < minSeparation)
+		else if(separation < minSeparation)
 		{
 			_zoomCamera.targetZoom = minZoom;
 		}
 		else
 		{
-			var currentSeparationDifference:Float = xSeparation - minSeparation;
+			var currentSeparationDifference:Float = separation - minSeparation;
 			var currentSeparationRatio:Float = currentSeparationDifference/separationDifference;
 
 			var currentZoom:Float = minZoom - (zoomDifference * currentSeparationRatio);
