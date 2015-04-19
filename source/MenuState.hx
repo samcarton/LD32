@@ -26,6 +26,8 @@ class MenuState extends FlxState
 	 */
 	override public function create():Void
 	{
+		FlxG.cameras.bgColor = 0xFF000000;
+
 		_buttonHit = false;
 
 		_background = FlxGradient.createGradientFlxSprite(800,250,[0xFF000000,0xFFFFFFFF,0xFF000000],10,90);

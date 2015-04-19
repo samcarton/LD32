@@ -2,6 +2,7 @@ package;
 
 import flash.filters.GlowFilter;
 import flixel.effects.particles.FlxEmitter;
+import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -64,6 +65,12 @@ class PlayState extends FlxState
 
 	// particles
 	private var _scraps:FlxEmitter;
+
+	// HUD
+	private var _hudBg:FlxSprite;
+	private var _hudWinnerText:FlxText;
+	private var _hudRematchText:FlxText;
+	private var _gameEndState:Bool = false;
 
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -183,10 +190,25 @@ class PlayState extends FlxState
 		_zoomCamera = new FlxZoomCamera(0,0,FlxG.width,FlxG.height,1);
 		_zoomCamera.follow(_dummyMidPoint,5);
 		FlxG.cameras.add(_zoomCamera);
-		//FlxG.camera.follow(_dummyMidPoint, 5);
-		//FlxG.camera.zoom = 5;
+		
+		// HUD
+		var hudCam:FlxCamera = new FlxCamera(0,0,FlxG.width,FlxG.height);
+		hudCam.bgColor = 0x00000000;		
+		FlxG.cameras.add(hudCam);
+		
+		_hudBg = new FlxSprite(3000, -175);
+		_hudBg.makeGraphic(FlxG.width,FlxG.height, 0x00000000);
+		add(_hudBg);
+		hudCam.follow(_hudBg);
 
-		//add(new FlxText("PLAYSTATE"));
+		_hudWinnerText = new FlxText(3000 + FlxG.width/3,20,0," WINS BY OVERFLOW",16);
+		_hudWinnerText.visible = false;
+		add(_hudWinnerText);
+
+		_hudRematchText = new FlxText(3000 + FlxG.width/3,60,0,"REMATCH? Y/N",16);
+		_hudRematchText.visible = false;
+		add(_hudRematchText);
+		
 		super.create();
 	}
 
@@ -352,24 +374,43 @@ class PlayState extends FlxState
 		FlxG.overlap(_p1Keyboard, _player2, OnKeyboardOverlap);
 		FlxG.overlap(_p2Keyboard, _player1, OnKeyboardOverlap);
 
-		UpdateBars();
+		CheckForDeath();
 		//DebugCharge();
 		super.update();
 		//FlxG.collide(_player1, _tileMap);
 	}	
 
-	private function UpdateBars():Void
+	private function CheckForDeath():Void
 	{
-		if(_player1.alive == false)
+		if(_player1.alive == false && _gameEndState == false)
 		{
 			_p1HealthBar.visible = false;
 			_p1ChargeBar.visible = false;
+			_gameEndState = true;
+			_hudWinnerText.text = "PC1" + _hudWinnerText.text;
 		}
-		if(_player2.alive == false)
+		if(_player2.alive == false && _gameEndState == false)
 		{
 			_p2HealthBar.visible = false;
 			_p2ChargeBar.visible = false;
+			_gameEndState = true;
+			_hudWinnerText.text = "PC2" + _hudWinnerText.text;
 		}
+
+		if(_gameEndState)
+		{
+			_hudWinnerText.visible = true;
+			_hudRematchText.visible = true;
+			if(FlxG.keys.justPressed.Y)
+			{
+				FlxG.resetState();
+			} 
+			else if(FlxG.keys.justPressed.N)
+			{
+				FlxG.switchState(new MenuState());
+			}
+		}
+
 	}
 
 	private function OnProjectileOverlap(Sprite1:FlxObject, Sprite2:FlxObject):Void
