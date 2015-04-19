@@ -7,6 +7,7 @@ import flash.events.Event;
 import flash.Lib;
 import flixel.FlxGame;
 import flixel.FlxState;
+import flixel.FlxG;
 
 class Main extends Sprite 
 {
@@ -64,5 +65,7 @@ class Main extends Sprite
 		}
 
 		addChild(new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen));
+
+		FlxG.sound.playMusic(AssetPaths.ld32song2__mp3,1,true);
 	}
 }
