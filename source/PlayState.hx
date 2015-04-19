@@ -1,6 +1,7 @@
 package;
 
 import flash.filters.GlowFilter;
+import flixel.effects.particles.FlxEmitter;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -60,6 +61,9 @@ class PlayState extends FlxState
 	// heal effects
 	private var _p1Heal:HealEffect;
 	private var _p2Heal:HealEffect;
+
+	// particles
+	private var _scraps:FlxEmitter;
 
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -146,10 +150,10 @@ class PlayState extends FlxState
 		
 
 		// BARS
-		CreateHealthBar(_player1,_p1HealthBar);
-		CreateHealthBar(_player2,_p2HealthBar);		
-		CreateChargeBars(_player1,_p1ChargeBar);
-		CreateChargeBars(_player2,_p2ChargeBar);
+		_p1HealthBar= CreateHealthBar(_player1,_p1HealthBar);
+		_p2HealthBar = CreateHealthBar(_player2,_p2HealthBar);		
+		_p1ChargeBar = CreateChargeBars(_player1,_p1ChargeBar);
+		_p2ChargeBar = CreateChargeBars(_player2,_p2ChargeBar);
 
 		_chargeDebug = new FlxText(_player1.x, _player1.y, 100, "", 10);
 		add(_chargeDebug);
@@ -163,6 +167,18 @@ class PlayState extends FlxState
 
 		add(_p1Heal);
 		add(_p2Heal);
+
+		// particles
+		_scraps = new FlxEmitter();
+		_scraps.setXSpeed(-150,150);
+		_scraps.setXSpeed(-200,0);
+		_scraps.setRotation(-720,720);
+		_scraps.gravity = 400;
+		_scraps.bounce = 0.35;
+		_scraps.makeParticles(AssetPaths.scraps__png,100,20,true,0.5);
+		_player1.ScrapsEmitter = _scraps;
+		_player2.ScrapsEmitter = _scraps;
+		add(_scraps);
 		
 		_zoomCamera = new FlxZoomCamera(0,0,FlxG.width,FlxG.height,1);
 		_zoomCamera.follow(_dummyMidPoint,5);
@@ -174,16 +190,17 @@ class PlayState extends FlxState
 		super.create();
 	}
 
-	private function CreateHealthBar(parent:Dynamic, outBar:Dynamic):Void
+	private function CreateHealthBar(parent:Dynamic, outBar:Dynamic):FlxBar
 	{
 		outBar = new FlxBar(0, 0, FlxBar.FILL_LEFT_TO_RIGHT, 17, 3,parent, "Health", 0,100);
 		outBar.createFilledBar(0xFFFF0000,0xFF00FF00,true, 0xFF262626);
 		outBar.setParent(parent,"Health",true,0,-10);
 		//outBar.solid = false;
 		add(outBar);
+		return outBar;
 	}
 
-	private function CreateChargeBars(parent:Dynamic, outBar:Dynamic):Void
+	private function CreateChargeBars(parent:Dynamic, outBar:Dynamic):FlxBar
 	{
 		outBar = new FlxBar(0, 0, FlxBar.FILL_LEFT_TO_RIGHT, 17, 3,parent, "Charge", 0,100);
 		//outBar.createFilledBar(0xFF0000FF,0xFF00FF00,true, 0xFF262626);
@@ -200,6 +217,7 @@ class PlayState extends FlxState
 		outBar.setParent(parent,"Charge",true,0,-8);
 		//outBar.solid = false;
 		add(outBar);
+		return outBar;
 	}
 	
 	private function PlaceEntities(entityName:String, entityData:Xml):Void
@@ -322,6 +340,7 @@ class PlayState extends FlxState
 	override public function update():Void
 	{
 		UpdateMidPoint();
+		FlxG.collide(_scraps, _tileMap);
 		FlxG.collide(_player1, _tileMap);
 		FlxG.collide(_player2, _tileMap);
 		FlxG.collide(_player1, _player2);
@@ -333,10 +352,25 @@ class PlayState extends FlxState
 		FlxG.overlap(_p1Keyboard, _player2, OnKeyboardOverlap);
 		FlxG.overlap(_p2Keyboard, _player1, OnKeyboardOverlap);
 
+		UpdateBars();
 		//DebugCharge();
 		super.update();
 		//FlxG.collide(_player1, _tileMap);
 	}	
+
+	private function UpdateBars():Void
+	{
+		if(_player1.alive == false)
+		{
+			_p1HealthBar.visible = false;
+			_p1ChargeBar.visible = false;
+		}
+		if(_player2.alive == false)
+		{
+			_p2HealthBar.visible = false;
+			_p2ChargeBar.visible = false;
+		}
+	}
 
 	private function OnProjectileOverlap(Sprite1:FlxObject, Sprite2:FlxObject):Void
 	{

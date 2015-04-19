@@ -9,6 +9,7 @@ import flixel.util.FlxPoint;
 import flixel.util.FlxAngle;
 import flixel.util.FlxSpriteUtil;
 import flixel.system.FlxSound;
+import flixel.effects.particles.FlxEmitter;
 
 class Player extends FlxSprite
 {
@@ -71,6 +72,8 @@ class Player extends FlxSprite
 	private var _sndShoot:FlxSound;
 	private var _sndSwing:FlxSound;
 	public var _sndBigShootAfter:FlxSound;
+
+	public var ScrapsEmitter:FlxEmitter;
 	
 	// healeffect
 	public var HealFx:HealEffect;
@@ -346,6 +349,11 @@ class Player extends FlxSprite
 	{
 		alive = false;
 		exists = false;
+		if(ScrapsEmitter != null)
+		{
+			ScrapsEmitter.at(this);
+			ScrapsEmitter.start(true,5,0,50);
+		}
 		new flixel.util.FlxTimer(2, function(_){FinishKill();});		
 	}
 
