@@ -86,10 +86,10 @@ class PlayState extends FlxState
 
 		FlxG.cameras.bgColor = 0x00000000;//0xFF666666;
 
-		_mapLoader = new FlxOgmoLoader(AssetPaths.level001__oel);
-		_tileMap = _mapLoader.loadTilemap(AssetPaths.tiles__png,16,16,"stage");
+		_mapLoader = new FlxOgmoLoader(AssetPaths.level002__oel);
+		_tileMap = _mapLoader.loadTilemap(AssetPaths.tiles2__png,16,16,"stage");
 		_tileMap.setTileProperties(1, FlxObject.ANY);
-		_tileMap.setTileProperties(2, FlxObject.WALL);
+		_tileMap.setTileProperties(2, FlxObject.ANY);
 		add(_tileMap);
 
 		// Projectiles
