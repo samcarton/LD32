@@ -78,6 +78,8 @@ class Player extends FlxSprite
 	// healeffect
 	public var HealFx:HealEffect;
 
+	public var BackgroundRef:Background;
+
 	public function new(PlayerColor:Int,
 		ProjectilesL1:FlxTypedGroup<ProjectileL1>, 
 		ProjectilesL2:FlxTypedGroup<ProjectileL2>, 
@@ -269,6 +271,10 @@ class Player extends FlxSprite
 			return;
 		}
 
+		if(BackgroundRef != null)
+		{
+			BackgroundRef.addHitString();
+		}
 		Flicker(1.2);
 
 		_sndHit.play(true);

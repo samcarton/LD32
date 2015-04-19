@@ -74,6 +74,9 @@ class PlayState extends FlxState
 	private var _gameEndState:Bool = false;
 	private var _buttonSound:FlxSound;
 
+	// background
+	private var _background:Background;
+
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
@@ -81,7 +84,7 @@ class PlayState extends FlxState
 	{
 		FlxG.mouse.visible = false;
 
-		FlxG.cameras.bgColor = 0xFF666666;
+		FlxG.cameras.bgColor = 0x00000000;//0xFF666666;
 
 		_mapLoader = new FlxOgmoLoader(AssetPaths.level001__oel);
 		_tileMap = _mapLoader.loadTilemap(AssetPaths.tiles__png,16,16,"stage");
@@ -188,9 +191,24 @@ class PlayState extends FlxState
 		_player1.ScrapsEmitter = _scraps;
 		_player2.ScrapsEmitter = _scraps;
 		add(_scraps);
-		
+
+
+		// background		
+		var bgCam:FlxCamera = new FlxCamera(0,0,FlxG.width,FlxG.height);
+		bgCam.bgColor = 0xFF282828;
+		FlxG.cameras.add(bgCam);
+
+		_background = new Background();
+		add(_background);
+		bgCam.follow(_background._backGround);
+
+		_player1.BackgroundRef = _background;
+		_player2.BackgroundRef = _background;
+
+		// Main camera		
 		_zoomCamera = new FlxZoomCamera(0,0,FlxG.width,FlxG.height,1);
 		_zoomCamera.follow(_dummyMidPoint,5);
+		_zoomCamera.bgColor = 0x00000000;
 		FlxG.cameras.add(_zoomCamera);
 		
 		// HUD
@@ -398,6 +416,7 @@ class PlayState extends FlxState
 			_p1ChargeBar.visible = false;
 			_gameEndState = true;
 			_hudWinnerText.text = "PC1" + _hudWinnerText.text;
+			_background.addDeathString();
 		}
 		if(_player2.alive == false && _gameEndState == false)
 		{
@@ -405,6 +424,7 @@ class PlayState extends FlxState
 			_p2ChargeBar.visible = false;
 			_gameEndState = true;
 			_hudWinnerText.text = "PC2" + _hudWinnerText.text;
+			_background.addDeathString();
 		}
 
 		if(_gameEndState)
@@ -432,6 +452,7 @@ class PlayState extends FlxState
 			if(Std.is(Sprite2, Player) )
 			{
 				Sprite2.hurt(ProjectileL1.Damage);
+				_background.addHitString();
 			}
 		}
 		else if(  Std.is(Sprite1, ProjectileL2))
@@ -440,6 +461,7 @@ class PlayState extends FlxState
 			if(Std.is(Sprite2, Player) )
 			{
 				Sprite2.hurt(ProjectileL2.Damage);
+				_background.addHitString();
 			}
 		}
 		else if(  Std.is(Sprite1, ProjectileL3))
@@ -448,6 +470,7 @@ class PlayState extends FlxState
 			if(Std.is(Sprite2, Player) )
 			{
 				Sprite2.hurt(ProjectileL3.Damage);
+				_background.addHitString();
 				_zoomCamera.shake(0.01);
 			}
 		}		
@@ -459,7 +482,7 @@ class PlayState extends FlxState
 		{			
 			if(Std.is(Sprite2, Player) )
 			{
-				Sprite2.hurt(Keyboard.Damage);
+				Sprite2.hurt(Keyboard.Damage);				
 				_zoomCamera.shake(0.005,0.1);
 				var kb:Keyboard = Std.instance(Sprite1, Keyboard);
 				if(kb != null)
