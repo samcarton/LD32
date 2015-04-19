@@ -57,6 +57,10 @@ class PlayState extends FlxState
 	// camera
 	private var _zoomCamera:FlxZoomCamera;	
 
+	// heal effects
+	private var _p1Heal:HealEffect;
+	private var _p2Heal:HealEffect;
+
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
@@ -149,6 +153,16 @@ class PlayState extends FlxState
 
 		_chargeDebug = new FlxText(_player1.x, _player1.y, 100, "", 10);
 		add(_chargeDebug);
+
+		// Heal effects
+		_p1Heal = new HealEffect();
+		_p2Heal = new HealEffect();
+
+		_player1.HealFx = _p1Heal;
+		_player2.HealFx = _p2Heal;
+
+		add(_p1Heal);
+		add(_p2Heal);
 		
 		_zoomCamera = new FlxZoomCamera(0,0,FlxG.width,FlxG.height,1);
 		_zoomCamera.follow(_dummyMidPoint,5);

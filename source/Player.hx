@@ -72,6 +72,8 @@ class Player extends FlxSprite
 	private var _sndSwing:FlxSound;
 	public var _sndBigShootAfter:FlxSound;
 	
+	// healeffect
+	public var HealFx:HealEffect;
 
 	public function new(PlayerColor:Int,
 		ProjectilesL1:FlxTypedGroup<ProjectileL1>, 
@@ -136,6 +138,7 @@ class Player extends FlxSprite
 		Shoot();
 		KeyboardAttack();
 		Sounds();
+		UpdateHeal();
 		super.update();
 	} 
 	
@@ -234,18 +237,21 @@ class Player extends FlxSprite
 			var midPoint:FlxPoint = getMidpoint();
 			_projectilesL3.recycle(ProjectileL3).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.25),velocity);
 			new flixel.util.FlxTimer(0.1, function(_){_sndBigShootAfter.play(true);});
+			Heal(20);
 		}
 		else if
 		(Charge >= _chargeLevel2)
 		{
 			var midPoint:FlxPoint = getMidpoint();
 			_projectilesL2.recycle(ProjectileL2).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.15),velocity);
+			Heal(10);
 		}
 		else if
 		(Charge >= _chargeLevel1)
 		{
 			var midPoint:FlxPoint = getMidpoint();
-			_projectilesL1.recycle(ProjectileL1).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.10),velocity);			
+			_projectilesL1.recycle(ProjectileL1).Shoot(midPoint, new FlxPoint(facing == FlxObject.RIGHT ? 1 : -1,-0.10),velocity);
+			Heal(5);
 		}
 
 		Charge = _chargeEmptyValue;
@@ -307,6 +313,33 @@ class Player extends FlxSprite
 			_sndLand.play(true);
 		}
 		_wasTouchingFloorBefore = isTouchingFloorNow;
+	}
+
+	private function UpdateHeal():Void
+	{
+		if(HealFx != null)
+		{
+			HealFx.x = x;
+			HealFx.y = y;
+		}
+	}
+
+	private function Heal(amount:Float):Void
+	{
+		if(Health >= 100)
+		{
+			return;
+		}
+
+		Health += amount;
+		if(Health > 100)
+		{
+			Health = 100;
+		}
+		if(HealFx != null)
+		{
+			HealFx.PlayHeal();
+		}	
 	}
 
 	override public function kill():Void
